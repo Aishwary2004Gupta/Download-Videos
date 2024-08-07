@@ -3,7 +3,6 @@ import yt_dlp
 import os
 import platform
 import time
-import re
 
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'  # Replace with your generated secret key
@@ -25,10 +24,6 @@ def get_default_desktop_path():
         return os.path.join(os.path.expanduser('~'), 'Desktop')
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Desktop')
-
-def sanitize_filename(filename):
-    """Sanitize the filename by removing invalid characters."""
-    return re.sub(r'[<>:"/\\|?*]', '', filename)
 
 @app.route('/')
 def index():
@@ -60,9 +55,8 @@ def download():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(video_url, download=False)
             video_title = info_dict.get('title', 'video')
-            video_title_sanitized = sanitize_filename(video_title)
             file_ext = info_dict.get('ext', 'mp4')
-            output_filename = f"{video_title_sanitized}.{file_ext}"
+            output_filename = f"{video_title}.{file_ext}"
             output_filepath = os.path.join(output_path, output_filename)
 
             ydl.download([video_url])
@@ -72,9 +66,9 @@ def download():
 
         flash(f'Video downloaded successfully to {output_path}!', 'success')
     except Exception as e:
-        flash(f'An error occurred: {str(e)}', 'danger')
+        flash(f'Try finding the video in your downloads folder using the video title')
 
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=False,host='0.0.0.0')
+    app.run(debug=True)
