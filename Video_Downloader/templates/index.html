@@ -96,11 +96,32 @@
     height: 50px;  /* Adjust the size as needed */
     z-index: 2; /* Ensure it's above the Spline embed */
     }
+
+    .credits {
+        position: absolute;
+        bottom: 20px; /* Adjust position as needed */
+        right: 20px;  /* Adjust position as needed */
+        z-index: 2; /* Ensure it's above the Spline embed */
+        font-size: 1em;
+        color: #000;
+    }
+
+    .credits a {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .credits a:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <body>
     <iframe class="spline-embed" src="https://my.spline.design/macbookprocopycopycopy-a9ccd8d38898ff1a22f4118cdab3483c/"></iframe>
     <div class="overlay"></div>
+    <div class="credits">
+        <a href="https://github.com/Aishwary2004Gupta" target="_blank">Made by Aishwary Gupta</a>
+    </div>
     <div class="container">
         <h1>Video Downloader</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
