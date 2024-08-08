@@ -6,10 +6,10 @@ import time
 import re
 
 app = Flask(__name__)
-app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'  # Replace with your generated secret key
+app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'  
 
 def get_default_download_path():
-    """Returns the default path for downloads based on the OS."""
+    
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Downloads')
     elif platform.system() == 'Darwin':  # macOS
@@ -18,7 +18,7 @@ def get_default_download_path():
         return os.path.join(os.path.expanduser('~'), 'Downloads')
 
 def get_default_desktop_path():
-    """Returns the default path for the desktop based on the OS."""
+    
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Desktop')
     elif platform.system() == 'Darwin':  # macOS
@@ -27,7 +27,6 @@ def get_default_desktop_path():
         return os.path.join(os.path.expanduser('~'), 'Desktop')
 
 def sanitize_filename(filename):
-    """Sanitize the filename by removing invalid characters."""
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
 @app.route('/')
@@ -37,7 +36,7 @@ def index():
 @app.route('/download', methods=['POST'])
 def download():
     video_url = request.form['video_url']
-    path_choice = request.form.get('path_choice')  # Added field for choosing path
+    path_choice = request.form.get('path_choice')  
 
     if path_choice == 'downloads':
         output_path = get_default_download_path()
@@ -47,7 +46,6 @@ def download():
         flash('Invalid path choice. Please select a valid option.', 'danger')
         return redirect(url_for('index'))
 
-    # Ensure the output path exists
     if not os.path.exists(output_path):
         flash(f'The directory {output_path} does not exist.', 'danger')
         return redirect(url_for('index'))
@@ -67,7 +65,6 @@ def download():
 
             ydl.download([video_url])
 
-            # Update the file's modified time to current time
             os.utime(output_filepath, (time.time(), time.time()))
 
         flash(f'Video downloaded successfully to {output_path}!', 'success')
