@@ -36,9 +36,11 @@ You could even watch your video being downladed from the terminal 👇🏻 or wa
 ![Download successfull](https://github.com/user-attachments/assets/a79fb69e-867c-4ded-a5f3-ff1f3857cf8c)
 
 
-NOTE* 
+NOTE*  
 Even after following all these steps if you face an error while downloading a video it's most problably beacause you don't have ffmpeg installed in your system.
+Watch this video in case of an error related to ffmpeg
 
+    https://youtu.be/r1AtmY-RMyQ
 
 
 
