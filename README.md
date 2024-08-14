@@ -43,4 +43,4 @@ Watch this video in case of an error related to ffmpeg
     https://youtu.be/r1AtmY-RMyQ
 
 
-
+Background was made using Spline
