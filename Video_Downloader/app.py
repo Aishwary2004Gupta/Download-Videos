@@ -64,8 +64,6 @@ def download():
             output_filename = f"{video_title_sanitized}.{file_ext}"
             output_filepath = os.path.join(output_path, output_filename)
 
-            # No need to call os.utime here since we are sending the file directly
-
         return send_file(output_filepath, as_attachment=True)  # Send the file for download
 
     except Exception as e:
