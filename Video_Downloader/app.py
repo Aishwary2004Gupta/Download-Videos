@@ -51,6 +51,7 @@ def download():
         return redirect(url_for('index'))
 
     ydl_opts = {
+        'format': 'bestvideo+bestaudio/best',  # Download best video and audio
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
     }
 
