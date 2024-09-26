@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, send_file
+from flask import Flask, render_template, request, flash, redirect, url_for, send_file, Response
 import yt_dlp
 import os
 import platform
@@ -29,6 +29,12 @@ def get_default_desktop_path():
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
+def progress_hook(d):
+    if d['status'] == 'downloading':
+        # Send progress to the client
+        percent = d['downloaded_bytes'] / d['total_bytes'] * 100
+        print(f'Download progress: {percent:.2f}%')  # You can log this or send it to the client
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -53,6 +59,8 @@ def download():
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',  # Download best video and audio
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'progress_hooks': [progress_hook],  # Add progress hook
+
     }
 
     try:
