@@ -56,18 +56,17 @@ def download():
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=False)
+            info_dict = ydl.extract_info(video_url, download=True)  # Change to download=True
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
             file_ext = info_dict.get('ext', 'mp4')
             output_filename = f"{video_title_sanitized}.{file_ext}"
             output_filepath = os.path.join(output_path, output_filename)
 
-            ydl.download([video_url])
+            # No need to call os.utime here since we are sending the file directly
 
-            os.utime(output_filepath, (time.time(), time.time()))
+        return send_file(output_filepath, as_attachment=True)  # Send the file for download
 
-        flash(f'Video downloaded successfully to {output_path}!', 'success')
     except Exception as e:
         flash(f'Your video has been downloaded, try finding it using the video title', 'danger')
 
