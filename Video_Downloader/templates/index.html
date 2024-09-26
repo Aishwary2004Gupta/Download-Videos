@@ -132,17 +132,13 @@
         </ul>
         {% endif %}
         {% endwith %}
-        <form action="{{ url_for('download') }}" method="post">
-            <label for="video_url">Video URL:</label>
-            <input type="url" id="video_url" name="video_url" required>
-
-            <label for="path_choice">Save to:</label>
-            <select id="path_choice" name="path_choice" required>
+        <form id="downloadForm" action="{{ url_for('download') }}" method="post">
+            <input type="text" name="video_url" placeholder="Enter video URL" required>
+            <select name="path_choice">
                 <option value="downloads">Downloads</option>
                 <option value="desktop">Desktop</option>
             </select>
-            <br>
-            <button type="submit">Download Video</button>
+            <button type="submit">Download</button>
         </form>
     </div>
 </body>
