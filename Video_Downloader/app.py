@@ -71,14 +71,22 @@ def download():
     }
 
     try:
-        # Download video
+        # Extract video info and sanitize file name
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=True)  # Download the video
+            info_dict = ydl.extract_info(video_url, download=False)  # Get info but don't download yet
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
             file_ext = info_dict.get('ext', 'mp4')
             output_filename = f"{video_title_sanitized}.{file_ext}"
             output_filepath = os.path.join(output_path, output_filename)
+
+        # Check if file already exists
+        if os.path.exists(output_filepath):
+            flash(f"File {output_filename} already exists. Skipping download.", 'info')
+        else:
+            # Download video if not already present
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([video_url])  # Actually download the video
 
         # Serve the file for download
         return send_file(output_filepath, as_attachment=True)
