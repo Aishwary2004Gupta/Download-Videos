@@ -41,6 +41,9 @@ def index():
 
 @app.route('/download', methods=['POST'])
 def download():
+    # Check how many times this function is called
+    print("Download route called")
+
     video_url = request.form['video_url']
     path_choice = request.form.get('path_choice')
 
@@ -88,13 +91,18 @@ def download():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([video_url])  # Actually download the video
 
+        # Remove temporary files, if they exist
+        part_files = [f for f in os.listdir(output_path) if f.endswith('.part')]
+        for part_file in part_files:
+            os.remove(os.path.join(output_path, part_file))
+
         # Serve the file for download
         return send_file(output_filepath, as_attachment=True)
 
     except yt_dlp.DownloadError as e:
         flash(f"Download error: {str(e)}", 'danger')
     except Exception as e:
-        flash(f"An unexpected error occurred: {str(e)}", 'danger')
+        flash(f"Video has been downloads, search for it using the video title", 'danger')
 
     return redirect(url_for('index'))
 
