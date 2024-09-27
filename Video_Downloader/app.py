@@ -63,15 +63,16 @@ def download():
 
     # Set yt-dlp options to download best video and audio, merged into one file
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',  # Best video and audio format
-        'merge_output_format': 'mp4',  # Ensure the output is a merged MP4 file
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),  # Define output template
-        'progress_hooks': [progress_hook],  # Hook to monitor progress (optional)
-        'postprocessors': [{
-            'key': 'FFmpegVideoConvertor',  # Use FFmpeg to convert/merge video and audio
-            'preferedformat': 'mp4',  # Preferred format is MP4
-        }]
-    }
+    'format': 'bestvideo+bestaudio/best',  # Best video and audio format
+    'merge_output_format': 'mp4',  # Ensure the output is a merged MP4 file
+    'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),  # Define output template
+    'quiet': True,  # Disable progress output in console
+    'no-warnings': True,  # Disable warnings in console
+    'postprocessors': [{
+        'key': 'FFmpegVideoConvertor',  # Use FFmpeg to convert/merge video and audio
+        'preferedformat': 'mp4',  # Preferred format is MP4
+    }],
+}
 
     try:
         # Extract video info and sanitize file name
