@@ -59,7 +59,7 @@ def download():
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',  # Download best video and audio
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'progress_hooks': [progress_hook],  # Add progress hook
+        'progress_hooks': [progress_hook], 
     }
 
     try:
