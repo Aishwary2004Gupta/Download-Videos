@@ -112,6 +112,39 @@
     .credits a:hover {
         text-decoration: underline;
     }
+
+    /* Loader CSS */
+    .loader {
+        display: none;
+        border: 8px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 8px solid #3498db;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin-top: 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Message Styles */
+    .status-message {
+        display: none;
+        margin-top: 20px;
+        font-size: 1.2em;
+    }
+
+    .status-success {
+        color: green;
+    }
+
+    .status-fail {
+        color: red;
+    }
+
 </style>
 
 <body>
@@ -122,15 +155,6 @@
     </div>
     <div class="container">
         <h1>Video Downloader</h1>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <ul class="flashes">
-            {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
         <form id="downloadForm" action="{{ url_for('download') }}" method="post">
             <input type="text" name="video_url" id="video_url" placeholder="Enter video URL" required>
             <select name="path_choice">
@@ -139,6 +163,12 @@
             </select>
             <button type="submit">Download</button>
         </form>
+
+        <!-- Loader Element -->
+        <div class="loader" id="loader"></div>
+
+        <!-- Status Message -->
+        <div class="status-message" id="statusMessage"></div>
     </div>
 
     <script>
@@ -148,20 +178,39 @@
             let form = this;
             let formData = new FormData(form);
 
+            // Show loader
+            let loader = document.getElementById('loader');
+            let statusMessage = document.getElementById('statusMessage');
+            loader.style.display = 'block';
+            statusMessage.style.display = 'none';
+
             fetch(form.action, {
                 method: form.method,
                 body: formData
             }).then(response => {
+                // Hide loader
+                loader.style.display = 'none';
+
                 if (response.ok) {
-                    // Clear the URL input field after successful download
+                    // Show success message
+                    statusMessage.innerHTML = 'Download completed successfully!';
+                    statusMessage.className = 'status-message status-success';
+                    statusMessage.style.display = 'block';
+
+                    // Clear the URL input field
                     document.getElementById('video_url').value = '';
-                    // Optionally reload the page to refresh the form state
-                    window.location.reload();
                 } else {
-                    // Handle failure here if needed
-                    alert('There was an error. Please try again.');
+                    // Show error message
+                    statusMessage.innerHTML = 'There was an error. Please try again.';
+                    statusMessage.className = 'status-message status-fail';
+                    statusMessage.style.display = 'block';
                 }
             }).catch(error => {
+                // Hide loader and show error message
+                loader.style.display = 'none';
+                statusMessage.innerHTML = 'There was an error. Please try again.';
+                statusMessage.className = 'status-message status-fail';
+                statusMessage.style.display = 'block';
                 console.error('Error:', error);
             });
         });
