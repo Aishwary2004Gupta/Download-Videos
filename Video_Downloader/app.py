@@ -42,73 +42,46 @@ def index():
 
 @app.route('/download', methods=['POST'])
 def download():
-    # Check how many times this function is called
     print("Download route called")
 
     video_url = request.form['video_url']
     path_choice = request.form.get('path_choice')
 
     # Select the output path based on user choice
-    if path_choice == 'downloads':
-        output_path = get_default_download_path()
-    elif path_choice == 'desktop':
-        output_path = get_default_desktop_path()
-    else:
-        flash('Invalid path choice. Please select a valid option.', 'danger')
-        return redirect(url_for('index'))
+    output_path = get_default_download_path() if path_choice == 'downloads' else get_default_desktop_path()
 
     # Check if output path exists
     if not os.path.exists(output_path):
         flash(f'The directory {output_path} does not exist.', 'danger')
         return redirect(url_for('index'))
 
-    # Set yt-dlp options to download best video and audio, merged into one file
+    # Set yt-dlp options
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',  # Best video and audio format
-        'merge_output_format': 'mp4',  # Ensure the output is a merged MP4 file
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),  # Define output template
-        'quiet': True,  # Disable progress output in console
-        'no-warnings': True,  # Disable warnings in console
+        'format': 'bestvideo+bestaudio/best',
+        'merge_output_format': 'mp4',
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'quiet': True,
+        'no-warnings': True,
         'postprocessors': [{
-            'key': 'FFmpegVideoConvertor',  # Use FFmpeg to convert/merge video and audio
-            'preferedformat': 'mp4',  # Preferred format is MP4
+            'key': 'FFmpegVideoConvertor',
+            'preferedformat': 'mp4',
         }],
     }
 
     try:
-        # Extract video info and sanitize file name
+        # Download the video and extract the title
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=False)  # Get info but don't download yet
+            info_dict = ydl.extract_info(video_url, download=True)  # Change to download=True
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
-            file_ext = info_dict.get('ext', 'mp4')
-            output_filename = f"{video_title_sanitized}.{file_ext}"
-            output_filepath = os.path.join(output_path, output_filename)
 
-        # Check if file already exists
-        if os.path.exists(output_filepath):
-            flash(f"File {output_filename} already exists. Skipping download.", 'info')
-        else:
-            # Download video if not already present
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([video_url])  # Actually download the video
-
-            # Update the timestamp of the file to the current time after the download
-            current_time = time.time()
-            os.utime(output_filepath, (current_time, current_time))
-
-        # Remove temporary files, if they exist
-        part_files = [f for f in os.listdir(output_path) if f.endswith('.part')]
-        for part_file in part_files:
-            os.remove(os.path.join(output_path, part_file))
-
-        # Serve the file for download
-        return send_file(output_filepath, as_attachment=True)
+        flash(f"Video downloaded successfully: {video_title_sanitized}.mp4", 'success')
+        return redirect(url_for('index'))
 
     except yt_dlp.DownloadError as e:
         flash(f"Download error: {str(e)}", 'danger')
     except Exception as e:
-        flash(f"Video has been downloaded, search for it using the video title", 'danger')
+        flash(f"An error occurred: {str(e)}", 'danger')
 
     return redirect(url_for('index'))
 
