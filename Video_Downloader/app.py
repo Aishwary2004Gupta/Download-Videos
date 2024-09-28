@@ -103,7 +103,7 @@ def download():
     except yt_dlp.DownloadError as e:
         flash(f"Download error: {str(e)}", 'danger')
     except Exception as e:
-        flash(f"Video has been downloads, search for it using the video title", 'danger')
+        flash(f"Video has been downloaded, search for it using the video title", 'danger')
 
     return redirect(url_for('index'))
 
