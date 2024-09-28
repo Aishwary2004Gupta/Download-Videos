@@ -3,6 +3,7 @@ import yt_dlp
 import os
 import platform
 import re
+import time
 
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
@@ -63,16 +64,16 @@ def download():
 
     # Set yt-dlp options to download best video and audio, merged into one file
     ydl_opts = {
-    'format': 'bestvideo+bestaudio/best',  # Best video and audio format
-    'merge_output_format': 'mp4',  # Ensure the output is a merged MP4 file
-    'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),  # Define output template
-    'quiet': True,  # Disable progress output in console
-    'no-warnings': True,  # Disable warnings in console
-    'postprocessors': [{
-        'key': 'FFmpegVideoConvertor',  # Use FFmpeg to convert/merge video and audio
-        'preferedformat': 'mp4',  # Preferred format is MP4
-    }],
-}
+        'format': 'bestvideo+bestaudio/best',  # Best video and audio format
+        'merge_output_format': 'mp4',  # Ensure the output is a merged MP4 file
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),  # Define output template
+        'quiet': True,  # Disable progress output in console
+        'no-warnings': True,  # Disable warnings in console
+        'postprocessors': [{
+            'key': 'FFmpegVideoConvertor',  # Use FFmpeg to convert/merge video and audio
+            'preferedformat': 'mp4',  # Preferred format is MP4
+        }],
+    }
 
     try:
         # Extract video info and sanitize file name
@@ -91,6 +92,10 @@ def download():
             # Download video if not already present
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([video_url])  # Actually download the video
+
+            # Update the timestamp of the file to the current time after the download
+            current_time = time.time()
+            os.utime(output_filepath, (current_time, current_time))
 
         # Remove temporary files, if they exist
         part_files = [f for f in os.listdir(output_path) if f.endswith('.part')]
