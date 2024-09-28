@@ -55,7 +55,6 @@ def download():
         flash(f'The directory {output_path} does not exist.', 'danger')
         return redirect(url_for('index'))
 
-    # Set yt-dlp options
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
         'merge_output_format': 'mp4',
@@ -71,7 +70,7 @@ def download():
     try:
         # Download the video and extract the title
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=True)  # Change to download=True
+            info_dict = ydl.extract_info(video_url, download=True)
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
 
