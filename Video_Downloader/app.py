@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, send_file
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 import yt_dlp
 import os
 import platform
@@ -7,6 +7,8 @@ import time
 
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
+
+progress_data = {"progress": 0}  # Global variable to store progress
 
 # Function to get the default download path
 def get_default_download_path():
@@ -30,20 +32,32 @@ def get_default_desktop_path():
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
-# Progress hook to show download progress (optional)
+# Progress hook to show download progress
 def progress_hook(d):
     if d['status'] == 'downloading':
-        percent = d.get('downloaded_bytes', 0) / d.get('total_bytes', 1) * 100
-        print(f'Download progress: {percent:.2f}%')
+        total_bytes = d.get('total_bytes') or d.get('total_bytes_estimate', 0)
+        downloaded_bytes = d.get('downloaded_bytes', 0)
+
+        if total_bytes > 0:
+            percent = (downloaded_bytes / total_bytes) * 100
+            progress_data["progress"] = round(percent, 2)
+        else:
+            progress_data["progress"] = 0
+    elif d['status'] == 'finished':
+        progress_data["progress"] = 100
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/progress')
+def progress():
+    return jsonify(progress_data)  # Return the progress data as JSON
+
 @app.route('/download', methods=['POST'])
 def download():
-    print("Download route called")
-
+    global progress_data
+    progress_data["progress"] = 0  # Reset progress before starting download
     video_url = request.form['video_url']
     path_choice = request.form.get('path_choice')
 
@@ -59,13 +73,16 @@ def download():
         'format': 'bestvideo+bestaudio/best',
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'progress_hooks': [progress_hook],
         'quiet': True,
         'no-warnings': True,
+        'logger': None,  # Suppress internal logs from yt-dlp
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
         }],
     }
+
 
     try:
         # Download the video and extract the title

@@ -113,36 +113,24 @@
         text-decoration: underline;
     }
 
-    /* Loader CSS */
-    .loader {
-        display: none;
-        border: 8px solid #f3f3f3;
-        border-radius: 50%;
-        border-top: 8px solid #3498db;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
+    /* Progress Bar CSS */
+    .progress-bar {
+        width: 100%;
+        height: 30px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
         margin-top: 20px;
     }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Message Styles */
-    .status-message {
-        display: none;
-        margin-top: 20px;
-        font-size: 1.2em;
-    }
-
-    .status-success {
-        color: green;
-    }
-
-    .status-fail {
-        color: red;
+    .progress-bar-fill {
+        height: 100%;
+        width: 0;
+        background-color: #4CAF50;
+        text-align: center;
+        line-height: 30px;
+        color: white;
+        transition: width 0.2s;
     }
 
 </style>
@@ -164,55 +152,38 @@
             <button type="submit">Download</button>
         </form>
 
-        <!-- Loader Element -->
-        <div class="loader" id="loader"></div>
-
-        <!-- Status Message -->
-        <div class="status-message" id="statusMessage"></div>
+        <!-- Progress bar -->
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressBarFill">0%</div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('downloadForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+        // Poll the server for progress updates
+        const progressBarFill = document.getElementById('progressBarFill');
 
-            let form = this;
-            let formData = new FormData(form);
+    async function fetchProgress() {
+        try {
+            const response = await fetch('/progress');
+            const data = await response.json();
+            const progress = data.progress;
 
-            // Show loader
-            let loader = document.getElementById('loader');
-            let statusMessage = document.getElementById('statusMessage');
-            loader.style.display = 'block';
-            statusMessage.style.display = 'none';
+            progressBarFill.style.width = `${progress}%`;
+            progressBarFill.textContent = `${progress}%`;
 
-            fetch(form.action, {
-                method: form.method,
-                body: formData
-            }).then(response => {
-                // Hide loader
-                loader.style.display = 'none';
+            if (progress < 100) {
+                setTimeout(fetchProgress, 500);  // Poll every 500ms
+            }
+        } catch (error) {
+            console.error('Error fetching progress:', error);
+        }
+    }
 
-                if (response.ok) {
-                    // Show success message
-                    statusMessage.innerHTML = 'Download completed successfully!';
-                    statusMessage.className = 'status-message status-success';
-                    statusMessage.style.display = 'block';
 
-                    // Clear the URL input field
-                    document.getElementById('video_url').value = '';
-                } else {
-                    // Show error message
-                    statusMessage.innerHTML = 'There was an error. Please try again.';
-                    statusMessage.className = 'status-message status-fail';
-                    statusMessage.style.display = 'block';
-                }
-            }).catch(error => {
-                // Hide loader and show error message
-                loader.style.display = 'none';
-                statusMessage.innerHTML = 'There was an error. Please try again.';
-                statusMessage.className = 'status-message status-fail';
-                statusMessage.style.display = 'block';
-                console.error('Error:', error);
-            });
+        // Start polling the server for progress after form submission
+        const downloadForm = document.getElementById('downloadForm');
+        downloadForm.addEventListener('submit', () => {
+            setTimeout(fetchProgress, 1000);  // Start polling after 1 second
         });
     </script>
 </body>
