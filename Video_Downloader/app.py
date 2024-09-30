@@ -24,7 +24,6 @@ def get_default_desktop_path():
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Desktop')
 
-# Function to sanitize filenames
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
