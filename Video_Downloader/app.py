@@ -8,6 +8,7 @@ import time
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 
+# Function to get the default download path
 def get_default_download_path():
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Downloads')
@@ -16,6 +17,7 @@ def get_default_download_path():
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Downloads')
 
+# Function to get the default desktop path
 def get_default_desktop_path():
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Desktop')
@@ -24,6 +26,7 @@ def get_default_desktop_path():
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Desktop')
 
+# Function to sanitize filenames
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
@@ -31,7 +34,7 @@ def sanitize_filename(filename):
 def progress_hook(d):
     if d['status'] == 'downloading':
         percent = d.get('downloaded_bytes', 0) / d.get('total_bytes', 1) * 100
-        print(f'Download progress: {percent:.2f}%')  # You can send this data to the frontend
+        print(f'Download progress: {percent:.2f}%')
 
 @app.route('/')
 def index():
@@ -70,6 +73,13 @@ def download():
             info_dict = ydl.extract_info(video_url, download=True)
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
+
+            # Get the final file path of the downloaded video
+            video_file_path = os.path.join(output_path, f"{video_title_sanitized}.mp4")
+
+            # Set the file's modification and access time to the current time
+            current_time = time.time()
+            os.utime(video_file_path, (current_time, current_time))
 
         flash(f"Video downloaded successfully: {video_title_sanitized}.mp4", 'success')
         return redirect(url_for('index'))
