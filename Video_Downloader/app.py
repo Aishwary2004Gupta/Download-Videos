@@ -16,7 +16,6 @@ def get_default_download_path():
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Downloads')
 
-# Function to get the default desktop path
 def get_default_desktop_path():
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Desktop')
