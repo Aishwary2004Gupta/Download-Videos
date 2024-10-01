@@ -32,19 +32,19 @@
         position: absolute;
         z-index: 1;
         background: rgba(255, 255, 255, 0.418);
-        padding: 40px; 
+        padding: 40px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        max-width: 500px; 
-        width: 100%; 
+        max-width: 500px;
+        width: 100%;
     }
 
     .container h1 {
-        margin-bottom: 30px; 
+        margin-bottom: 30px;
         font-size: 2em;
     }
 
@@ -56,50 +56,50 @@
     }
 
     .container label {
-        margin-top: 15px; 
-        font-size: 1.2em; 
+        margin-top: 15px;
+        font-size: 1.2em;
     }
 
     .container input,
     .container select,
     .container button {
         margin-top: 10px;
-        font-size: 1.2em; 
-        padding: 10px; 
-        width: 100%; 
+        font-size: 1.2em;
+        padding: 10px;
+        width: 100%;
     }
 
     .container button {
-        margin-top: 20px; 
-        background-color: #4CAF50; 
-        color: white; 
-        border: none; 
-        border-radius: 5px; 
+        margin-top: 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
         cursor: pointer;
     }
 
     .container button:hover {
-        background-color: #45a049; 
+        background-color: #45a049;
     }
 
     .overlay {
-    position: absolute;
-    bottom: 10px; 
-    right: 10px;  
-    background-image: url('{{ url_for("static", filename="purple.png") }}');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    width: 150px; 
-    height: 50px;  
-    z-index: 2; 
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-image: url('{{ url_for("static", filename="purple.png") }}');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+        width: 150px;
+        height: 50px;
+        z-index: 2;
     }
 
     .credits {
         position: absolute;
-        bottom: 20px; 
-        right: 20px;  
-        z-index: 2; 
+        bottom: 20px;
+        right: 20px;
+        z-index: 2;
         font-size: 1em;
         color: #000;
     }
@@ -161,28 +161,43 @@
     <script>
         // Poll the server for progress updates
         const progressBarFill = document.getElementById('progressBarFill');
+        const videoInput = document.getElementById('video_url');
+        const downloadForm = document.getElementById('downloadForm');
 
-    async function fetchProgress() {
-        try {
-            const response = await fetch('/progress');
-            const data = await response.json();
-            const progress = data.progress;
+        // Function to fetch the progress from the server
+        async function fetchProgress() {
+            try {
+                const response = await fetch('/progress');
+                const data = await response.json();
+                const progress = data.progress;
 
-            progressBarFill.style.width = `${progress}%`;
-            progressBarFill.textContent = `${progress}%`;
+                // Update the progress bar with the progress value
+                progressBarFill.style.width = `${progress}%`;
+                progressBarFill.textContent = `${progress}%`;
 
-            if (progress < 100) {
-                setTimeout(fetchProgress, 500);  // Poll every 500ms
+                // Continue polling if progress is less than 100%
+                if (progress < 100) {
+                    setTimeout(fetchProgress, 500);  // Poll every 500ms
+                } else {
+                    // Reset the form and progress bar after completion
+                    resetForm();
+                }
+            } catch (error) {
+                console.error('Error fetching progress:', error);
             }
-        } catch (error) {
-            console.error('Error fetching progress:', error);
         }
-    }
 
+        // Function to reset the form and progress bar
+        function resetForm() {
+            // Reset the input field and progress bar
+            videoInput.value = '';  // Clear the input field
+            progressBarFill.style.width = '0%';  // Reset progress bar width
+            progressBarFill.textContent = '0%';  // Reset progress bar text
+        }
 
         // Start polling the server for progress after form submission
-        const downloadForm = document.getElementById('downloadForm');
-        downloadForm.addEventListener('submit', () => {
+        downloadForm.addEventListener('submit', (event) => {
+            // Start fetching progress after form submission
             setTimeout(fetchProgress, 1000);  // Start polling after 1 second
         });
     </script>
