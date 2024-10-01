@@ -84,7 +84,6 @@ def download():
         }],
     }
 
-
     try:
         # Download the video and extract the title
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -99,7 +98,8 @@ def download():
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        return redirect(url_for('download_file'))  # Trigger the download after processing
+        # Send the file directly after download without redirecting
+        return send_file(downloaded_file_path, as_attachment=True, download_name=os.path.basename(downloaded_file_path))
 
     except yt_dlp.DownloadError as e:
         flash(f"Download error: {str(e)}", 'danger')
@@ -107,18 +107,6 @@ def download():
         flash(f"An error occurred: {str(e)}", 'danger')
 
     return redirect(url_for('index'))
-
-@app.route('/download_file')
-def download_file():
-    global downloaded_file_path
-    if downloaded_file_path:
-        file_to_send = downloaded_file_path  # Store the file path before resetting the progress
-        downloaded_file_path = None
-        progress_data["progress"] = 0  # Reset progress after download
-        return send_file(file_to_send, as_attachment=True, download_name=os.path.basename(file_to_send))
-    else:
-        flash('No file available for download.', 'danger')
-        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
