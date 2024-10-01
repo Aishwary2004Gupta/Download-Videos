@@ -111,7 +111,10 @@ def download():
 def download_file():
     global downloaded_file_path
     if downloaded_file_path:
-        return send_file(downloaded_file_path, as_attachment=True, download_name=os.path.basename(downloaded_file_path))
+        file_to_send = downloaded_file_path  # Store the file path before resetting the progress
+        downloaded_file_path = None
+        progress_data["progress"] = 0  # Reset progress after download
+        return send_file(file_to_send, as_attachment=True, download_name=os.path.basename(file_to_send))
     else:
         flash('No file available for download.', 'danger')
         return redirect(url_for('index'))
