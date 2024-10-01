@@ -75,14 +75,15 @@ def download():
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
-        'quiet': True,
-        'no-warnings': True,
-        'logger': None,  # Suppress internal logs from yt-dlp
+        'quiet': True,          # Suppress all unnecessary logs
+        'no-warnings': True,    # Suppress warnings
+        'logger': None,         # Disable internal yt-dlp logger
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
         }],
     }
+
 
     try:
         # Download the video and extract the title
