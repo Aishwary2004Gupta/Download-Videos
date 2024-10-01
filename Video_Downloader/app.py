@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file
 import yt_dlp
 import os
 import platform
@@ -9,6 +9,7 @@ app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 
 progress_data = {"progress": 0}  # Global variable to store progress
+downloaded_file_path = None  # To store the path of the downloaded file
 
 # Function to get the default download path
 def get_default_download_path():
@@ -56,7 +57,7 @@ def progress():
 
 @app.route('/download', methods=['POST'])
 def download():
-    global progress_data
+    global progress_data, downloaded_file_path
     progress_data["progress"] = 0  # Reset progress before starting download
     video_url = request.form['video_url']
     path_choice = request.form.get('path_choice')
@@ -83,7 +84,6 @@ def download():
         }],
     }
 
-
     try:
         # Download the video and extract the title
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -92,14 +92,13 @@ def download():
             video_title_sanitized = sanitize_filename(video_title)
 
             # Get the final file path of the downloaded video
-            video_file_path = os.path.join(output_path, f"{video_title_sanitized}.mp4")
+            downloaded_file_path = os.path.join(output_path, f"{video_title_sanitized}.mp4")
 
             # Set the file's modification and access time to the current time
             current_time = time.time()
-            os.utime(video_file_path, (current_time, current_time))
+            os.utime(downloaded_file_path, (current_time, current_time))
 
-        flash(f"Video downloaded successfully: {video_title_sanitized}.mp4", 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('download_file'))  # Trigger the download after processing
 
     except yt_dlp.DownloadError as e:
         flash(f"Download error: {str(e)}", 'danger')
@@ -107,6 +106,15 @@ def download():
         flash(f"An error occurred: {str(e)}", 'danger')
 
     return redirect(url_for('index'))
+
+@app.route('/download_file')
+def download_file():
+    global downloaded_file_path
+    if downloaded_file_path:
+        return send_file(downloaded_file_path, as_attachment=True, download_name=os.path.basename(downloaded_file_path))
+    else:
+        flash('No file available for download.', 'danger')
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
