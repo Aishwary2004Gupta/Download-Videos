@@ -15,7 +15,8 @@ downloaded_file_path = None
 def get_default_download_path():
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Downloads')
-    elif platform.system() == 'Darwin':  # macOS
+    # macOS
+    elif platform.system() == 'Darwin': 
         return os.path.join(os.path.expanduser('~'), 'Downloads')
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Downloads')
