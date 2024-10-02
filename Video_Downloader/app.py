@@ -8,7 +8,7 @@ import time
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 
-progress_data = {"progress": 0}  # Global variable to store progress
+progress_data = {"progress": 0}  
 downloaded_file_path = None  # To store the path of the downloaded file
 
 # Function to get the default download path
