@@ -59,7 +59,7 @@ def progress():
 @app.route('/download', methods=['POST'])
 def download():
     global progress_data, downloaded_file_path
-    progress_data["progress"] = 0  # Reset progress before starting download
+    progress_data["progress"] = 0  
     video_url = request.form['video_url']
     path_choice = request.form.get('path_choice')
 
