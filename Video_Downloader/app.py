@@ -76,9 +76,9 @@ def download():
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
-        'quiet': True,          
-        'no-warnings': True,    
-        'logger': None,       
+        'quiet': True,         
+        'no-warnings': True,   
+        'logger': None,
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
