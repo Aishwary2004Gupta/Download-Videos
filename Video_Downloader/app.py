@@ -62,6 +62,9 @@ def download():
     video_url = request.form['video_url']
     path_choice = request.form.get('path_choice')
 
+    # Debug print to check how many times this route is hit
+    print(f"Download requested for URL: {video_url} at {time.time()}")
+    
     # Select the output path based on user choice
     output_path = get_default_download_path() if path_choice == 'downloads' else get_default_desktop_path()
 
