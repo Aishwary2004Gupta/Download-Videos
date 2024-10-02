@@ -200,6 +200,10 @@
             // Start fetching progress after form submission
             setTimeout(fetchProgress, 1000);  // Start polling after 1 second
         });
+
+        document.querySelector('form').addEventListener('submit', function() {
+        document.querySelector('button[type="submit"]').disabled = true;
+    });
     </script>
 </body>
 
