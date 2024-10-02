@@ -15,8 +15,7 @@ downloaded_file_path = None
 def get_default_download_path():
     if platform.system() == 'Windows':
         return os.path.join(os.getenv('USERPROFILE'), 'Downloads')
-    # macOS
-    elif platform.system() == 'Darwin': 
+    elif platform.system() == 'Darwin':  # macOS
         return os.path.join(os.path.expanduser('~'), 'Downloads')
     else:  # Linux
         return os.path.join(os.path.expanduser('~'), 'Downloads')
@@ -99,8 +98,11 @@ def download():
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        # Send the file directly after download without redirecting
-        return send_file(downloaded_file_path, as_attachment=True, download_name=os.path.basename(downloaded_file_path))
+        # Only return the file after successful download, prevent duplicate sends
+        if os.path.exists(downloaded_file_path):
+            return send_file(downloaded_file_path, as_attachment=True, download_name=os.path.basename(downloaded_file_path))
+        else:
+            flash('The file could not be found.', 'danger')
 
     except yt_dlp.DownloadError as e:
         flash(f"Download error: {str(e)}", 'danger')
