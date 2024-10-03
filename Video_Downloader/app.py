@@ -1,33 +1,17 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, after_this_request
 import yt_dlp
 import os
 import platform
 import re
 import time
+import tempfile
+import shutil
 
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 
 progress_data = {"progress": 0}  
 downloaded_file_path = None  
-
-# Function to get the default download path
-def get_default_download_path():
-    if platform.system() == 'Windows':
-        return os.path.join(os.getenv('USERPROFILE'), 'Downloads')
-    elif platform.system() == 'Darwin':  # macOS
-        return os.path.join(os.path.expanduser('~'), 'Downloads')
-    else:  # Linux
-        return os.path.join(os.path.expanduser('~'), 'Downloads')
-
-# Function to get the default desktop path
-def get_default_desktop_path():
-    if platform.system() == 'Windows':
-        return os.path.join(os.getenv('USERPROFILE'), 'Desktop')
-    elif platform.system() == 'Darwin':  # macOS
-        return os.path.join(os.path.expanduser('~'), 'Desktop')
-    else:  # Linux
-        return os.path.join(os.path.expanduser('~'), 'Desktop')
 
 # Function to sanitize filenames
 def sanitize_filename(filename):
@@ -60,23 +44,17 @@ def download():
     global progress_data, downloaded_file_path
     progress_data["progress"] = 0  
     video_url = request.form['video_url']
-    path_choice = request.form.get('path_choice')
 
     # Debug print to check how many times this route is hit
     print(f"Download requested for URL: {video_url} at {time.time()}")
     
-    # Select the output path based on user choice
-    output_path = get_default_download_path() if path_choice == 'downloads' else get_default_desktop_path()
-
-    # Check if output path exists
-    if not os.path.exists(output_path):
-        flash(f'The directory {output_path} does not exist.', 'danger')
-        return redirect(url_for('index'))
-
+    # Use a temporary directory for storing the downloaded video
+    temp_dir = tempfile.mkdtemp()
+    
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
         'merge_output_format': 'mp4',
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
         'quiet': True,         
         'no-warnings': True,   
@@ -95,15 +73,24 @@ def download():
             video_title_sanitized = sanitize_filename(video_title)
 
             # Get the final file path of the downloaded video
-            downloaded_file_path = os.path.join(output_path, f"{video_title_sanitized}.mp4")
+            downloaded_file_path = os.path.join(temp_dir, f"{video_title_sanitized}.mp4")
 
             # Set the file's modification and access time to the current time
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        # Only return the file after successful download, prevent duplicate sends
+        # After the request is completed, delete the temporary directory and its contents
+        @after_this_request
+        def cleanup(response):
+            try:
+                shutil.rmtree(temp_dir)
+            except Exception as e:
+                print(f"Error cleaning up temp dir: {e}")
+            return response
+
+        # Return the file to the browser for download
         if os.path.exists(downloaded_file_path):
-            return send_file(downloaded_file_path, as_attachment=True, download_name=os.path.basename(downloaded_file_path))
+            return send_file(downloaded_file_path, as_attachment=True, download_name=f"{video_title_sanitized}.mp4")
         else:
             flash('The file could not be found.', 'danger')
 
