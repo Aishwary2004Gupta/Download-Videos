@@ -83,6 +83,8 @@ def download():
         @after_this_request
         def cleanup(response):
             try:
+                # Sleep for a short time to let the file be fully closed
+                time.sleep(1)
                 shutil.rmtree(temp_dir)
             except Exception as e:
                 print(f"Error cleaning up temp dir: {e}")
