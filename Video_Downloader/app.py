@@ -83,7 +83,7 @@ def download():
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        # After the request, cleanup temporary files
+        
         @after_this_request
         def cleanup(response):
             try:
