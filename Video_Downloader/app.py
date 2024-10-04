@@ -12,7 +12,6 @@ app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 progress_data = {"progress": 0}
 downloaded_file_path = None
 
-# Function to sanitize filenames
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
@@ -53,7 +52,7 @@ def download():
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    # Adjusted ydl_opts to handle Instagram and Twitter
+    
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',  # Download best quality video + audio
         'merge_output_format': 'mp4',
