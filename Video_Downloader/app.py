@@ -53,24 +53,22 @@ def download():
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    # Define different format for Instagram and Twitter (bypass login requirements)
+    # Set download options for YouTube, Twitter, and Instagram
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',  # This can be changed to 'best' to allow all formats
+        'format': 'bestvideo+bestaudio/best',  # Download best quality video + audio
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
         'quiet': True,
         'no-warnings': True,
-        'logger': None,
-        'retries': 10,  # Increased retries for better reliability
+        'retries': 10,  # Increase retries for network issues
         'http_headers': custom_headers,  # Custom headers for Instagram/Twitter
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
         }],
-        'noplaylist': False,  # Allow playlist downloading if needed
-        'age_limit': None,  # Remove age restrictions
-        'source_address': None,  # Allow downloads from any source address
+        'noplaylist': True,  # Only download single video, not playlist
+        'age_limit': None,  # Bypass age restrictions
     }
 
     try:
