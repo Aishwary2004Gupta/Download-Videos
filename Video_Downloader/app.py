@@ -55,20 +55,22 @@ def download():
 
     # Define different format for Instagram and Twitter (bypass login requirements)
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',
+        'format': 'bestvideo+bestaudio/best',  # This can be changed to 'best' to allow all formats
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
         'quiet': True,
         'no-warnings': True,
         'logger': None,
-        'retries': 5,  # Retry up to 5 times on failures
+        'retries': 10,  # Increased retries for better reliability
         'http_headers': custom_headers,  # Custom headers for Instagram/Twitter
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
         }],
-        'noplaylist': True,  # Ensure no playlist downloading
+        'noplaylist': False,  # Allow playlist downloading if needed
+        'age_limit': None,  # Remove age restrictions
+        'source_address': None,  # Allow downloads from any source address
     }
 
     try:
