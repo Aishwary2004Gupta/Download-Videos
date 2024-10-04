@@ -48,12 +48,12 @@ def download():
 
     temp_dir = tempfile.mkdtemp()
 
-    # Custom headers for bypassing credential requirements (Instagram/Twitter)
+    # Custom headers for bypassing credential requirements (Twitter)
     custom_headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    # Set download options for YouTube, Twitter, and Instagram
+    # Settings to improve reliability for Twitter downloads, handle retries and timeouts
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',  # Download best quality video + audio
         'merge_output_format': 'mp4',
@@ -62,13 +62,14 @@ def download():
         'quiet': True,
         'no-warnings': True,
         'retries': 10,  # Increase retries for network issues
-        'http_headers': custom_headers,  # Custom headers for Instagram/Twitter
+        'http_headers': custom_headers,  # Custom headers for Twitter
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
         }],
         'noplaylist': True,  # Only download single video, not playlist
-        'age_limit': None,  # Bypass age restrictions
+        'timeout': 600,  # Increase timeout to avoid connection issues
+        'sleep_interval_requests': 5,  # Pause between requests to prevent rate-limiting
     }
 
     try:
@@ -98,7 +99,10 @@ def download():
             flash('The file could not be found.', 'danger')
 
     except yt_dlp.DownloadError as e:
-        flash(f"Download error: {str(e)}", 'danger')
+        if "login required" in str(e).lower() and "instagram" in video_url:
+            flash('Instagram video download requires login. Please use cookies or login details.', 'danger')
+        else:
+            flash(f"Download error: {str(e)}", 'danger')
     except Exception as e:
         flash(f"An error occurred: {str(e)}", 'danger')
 
