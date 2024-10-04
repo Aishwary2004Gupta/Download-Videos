@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, after_this_request
 import yt_dlp
 import os
-import platform
 import re
 import time
 import tempfile
@@ -10,8 +9,8 @@ import shutil
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 
-progress_data = {"progress": 0}  
-downloaded_file_path = None  
+progress_data = {"progress": 0}
+downloaded_file_path = None
 
 # Function to sanitize filenames
 def sanitize_filename(filename):
@@ -37,60 +36,62 @@ def index():
 
 @app.route('/progress')
 def progress():
-    return jsonify(progress_data)  # Return the progress data as JSON
+    return jsonify(progress_data)
 
 @app.route('/download', methods=['POST'])
 def download():
     global progress_data, downloaded_file_path
-    progress_data["progress"] = 0  
+    progress_data["progress"] = 0
     video_url = request.form['video_url']
 
-    # Debug print to check how many times this route is hit
     print(f"Download requested for URL: {video_url} at {time.time()}")
-    
-    # Use a temporary directory for storing the downloaded video
+
     temp_dir = tempfile.mkdtemp()
-    
+
+    # Custom headers for bypassing credential requirements (Instagram/Twitter)
+    custom_headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+
+    # Define different format for Instagram and Twitter (bypass login requirements)
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
-        'quiet': True,         
-        'no-warnings': True,   
+        'quiet': True,
+        'no-warnings': True,
         'logger': None,
+        'retries': 5,  # Retry up to 5 times on failures
+        'http_headers': custom_headers,  # Custom headers for Instagram/Twitter
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
         }],
+        'noplaylist': True,  # Ensure no playlist downloading
     }
 
     try:
-        # Download the video and extract the title
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(video_url, download=True)
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
 
-            # Get the final file path of the downloaded video
             downloaded_file_path = os.path.join(temp_dir, f"{video_title_sanitized}.mp4")
 
-            # Set the file's modification and access time to the current time
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        # After the request is completed, delete the temporary directory and its contents
+        # After the request, cleanup temporary files
         @after_this_request
         def cleanup(response):
             try:
-                # Sleep for a short time to let the file be fully closed
                 time.sleep(1)
                 shutil.rmtree(temp_dir)
             except Exception as e:
                 print(f"Error cleaning up temp dir: {e}")
             return response
 
-        # Return the file to the browser for download
         if os.path.exists(downloaded_file_path):
             return send_file(downloaded_file_path, as_attachment=True, download_name=f"{video_title_sanitized}.mp4")
         else:
