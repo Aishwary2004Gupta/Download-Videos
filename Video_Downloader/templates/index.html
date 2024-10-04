@@ -55,11 +55,6 @@
         width: 100%;
     }
 
-    .container label {
-        margin-top: 15px;
-        font-size: 1.2em;
-    }
-
     .container input,
     .container select,
     .container button {
@@ -112,27 +107,6 @@
     .credits a:hover {
         text-decoration: underline;
     }
-
-    /* Progress Bar CSS */
-    .progress-bar {
-        width: 100%;
-        height: 30px;
-        background-color: #e0e0e0;
-        border-radius: 5px;
-        overflow: hidden;
-        margin-top: 20px;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        width: 0;
-        background-color: #4CAF50;
-        text-align: center;
-        line-height: 30px;
-        color: white;
-        transition: width 0.2s;
-    }
-
 </style>
 
 <body>
@@ -143,68 +117,15 @@
     </div>
     <div class="container">
         <h1>Video Downloader</h1>
-        <form id="downloadForm" action="{{ url_for('download') }}" method="post">
-            <input type="text" name="video_url" id="video_url" placeholder="Enter video URL" required>
+        <form action="{{ url_for('download') }}" method="post">
+            <input type="text" name="video_url" placeholder="Enter video URL" required>
             <select name="path_choice">
                 <option value="downloads">Downloads</option>
                 <option value="desktop">Desktop</option>
             </select>
             <button type="submit">Download</button>
         </form>
-
-        <!-- Progress bar -->
-        <div class="progress-bar">
-            <div class="progress-bar-fill" id="progressBarFill">0%</div>
-        </div>
     </div>
-
-    <script>
-        // Poll the server for progress updates
-        const progressBarFill = document.getElementById('progressBarFill');
-        const videoInput = document.getElementById('video_url');
-        const downloadForm = document.getElementById('downloadForm');
-
-        // Function to fetch the progress from the server
-        async function fetchProgress() {
-            try {
-                const response = await fetch('/progress');
-                const data = await response.json();
-                const progress = data.progress;
-
-                // Update the progress bar with the progress value
-                progressBarFill.style.width = `${progress}%`;
-                progressBarFill.textContent = `${progress}%`;
-
-                // Continue polling if progress is less than 100%
-                if (progress < 100) {
-                    setTimeout(fetchProgress, 500);  // Poll every 500ms
-                } else {
-                    // Reset the form and progress bar after completion
-                    resetForm();
-                }
-            } catch (error) {
-                console.error('Error fetching progress:', error);
-            }
-        }
-
-        // Function to reset the form and progress bar
-        function resetForm() {
-            // Reset the input field and progress bar
-            videoInput.value = '';  // Clear the input field
-            progressBarFill.style.width = '0%';  // Reset progress bar width
-            progressBarFill.textContent = '0%';  // Reset progress bar text
-        }
-
-        // Start polling the server for progress after form submission
-        downloadForm.addEventListener('submit', (event) => {
-            // Start fetching progress after form submission
-            setTimeout(fetchProgress, 1000);  // Start polling after 1 second
-        });
-
-        document.querySelector('form').addEventListener('submit', function() {
-        document.querySelector('button[type="submit"]').disabled = true;
-    });
-    </script>
 </body>
 
 </html>
