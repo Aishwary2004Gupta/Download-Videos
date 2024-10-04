@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, after_this_request
+from flask import Flask, render_template, request, flash, redirect, url_for, send_file, after_this_request
 import yt_dlp
 import os
 import re
@@ -9,39 +9,19 @@ import shutil
 app = Flask(__name__)
 app.secret_key = '1bd8a0bf5cde61924846417da9b121c2'
 
-progress_data = {"progress": 0}
 downloaded_file_path = None
 
 # Function to sanitize filenames
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
-# Progress hook to show download progress
-def progress_hook(d):
-    if d['status'] == 'downloading':
-        total_bytes = d.get('total_bytes') or d.get('total_bytes_estimate', 0)
-        downloaded_bytes = d.get('downloaded_bytes', 0)
-
-        if total_bytes > 0:
-            percent = (downloaded_bytes / total_bytes) * 100
-            progress_data["progress"] = round(percent, 2)
-        else:
-            progress_data["progress"] = 0
-    elif d['status'] == 'finished':
-        progress_data["progress"] = 100
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/progress')
-def progress():
-    return jsonify(progress_data)
-
 @app.route('/download', methods=['POST'])
 def download():
-    global progress_data, downloaded_file_path
-    progress_data["progress"] = 0
+    global downloaded_file_path
     video_url = request.form['video_url']
 
     print(f"Download requested for URL: {video_url} at {time.time()}")
@@ -58,8 +38,7 @@ def download():
         'format': 'bestvideo+bestaudio/best',  # Download best quality video + audio
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
-        'progress_hooks': [progress_hook],
-        'quiet': True,
+        'quiet': False,  # This will display the download progress in the console
         'no-warnings': True,
         'retries': 10,  # Increase retries for network issues
         'http_headers': custom_headers,  # Custom headers for Twitter
