@@ -43,6 +43,12 @@ def download():
     progress_data["progress"] = 0
     video_url = request.form['video_url']
 
+    # Ensure the form is reset after download
+    video_url = video_url.strip()
+    if not video_url:
+        flash("Please enter a valid URL.", "danger")
+        return redirect(url_for('index'))
+
     print(f"Download requested for URL: {video_url} at {time.time()}")
 
     temp_dir = tempfile.mkdtemp()
@@ -52,7 +58,6 @@ def download():
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',  # Download best quality video + audio
         'merge_output_format': 'mp4',
@@ -92,14 +97,19 @@ def download():
                 print(f"Error cleaning up temp dir: {e}")
             return response
 
+        # Send the downloaded file and then clear the URL
         if os.path.exists(downloaded_file_path):
+            flash('Download completed successfully!', 'success')
             return send_file(downloaded_file_path, as_attachment=True, download_name=f"{video_title_sanitized}.mp4")
         else:
             flash('The file could not be found.', 'danger')
 
     except yt_dlp.DownloadError as e:
+        # Check for login-required error for Instagram
         if "login required" in str(e).lower() and "instagram" in video_url:
             flash('Instagram video download requires login. Please use cookies or login details.', 'danger')
+        elif "rate-limit" in str(e).lower():
+            flash('Request rate limit reached. Please try again later.', 'danger')
         else:
             flash(f"Download error: {str(e)}", 'danger')
     except Exception as e:
