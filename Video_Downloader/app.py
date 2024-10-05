@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, after_this_request
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, after_this_request, jsonify, render_template
 import yt_dlp
 import os
 import re
