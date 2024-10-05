@@ -77,6 +77,23 @@
         background-color: #45a049;
     }
 
+    /* Progress bar styling */
+    .progress-bar {
+        width: 100%;
+        background-color: #f3f3f3;
+        margin-top: 20px;
+        height: 25px;
+        border-radius: 5px;
+        overflow: hidden;
+        display: none;
+    }
+
+    .progress {
+        height: 100%;
+        background-color: #4CAF50;
+        width: 0%;
+    }
+
     .overlay {
         position: absolute;
         bottom: 10px;
@@ -117,7 +134,7 @@
     </div>
     <div class="container">
         <h1>Video Downloader</h1>
-        <form action="{{ url_for('download') }}" method="post">
+        <form id="downloadForm" action="{{ url_for('download') }}" method="post">
             <input type="text" name="video_url" placeholder="Enter video URL" required>
             <select name="path_choice">
                 <option value="downloads">Downloads</option>
@@ -125,8 +142,31 @@
             </select>
             <button type="submit">Download</button>
         </form>
+
+        <!-- Progress bar -->
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
     </div>
-    
+
+    <script>
+        document.getElementById('downloadForm').addEventListener('submit', function (e) {
+            // Show the progress bar
+            document.querySelector('.progress-bar').style.display = 'block';
+
+            // Simulate progress (for demo purposes)
+            let progress = document.querySelector('.progress');
+            let width = 0;
+            let interval = setInterval(function () {
+                if (width >= 100) {
+                    clearInterval(interval);
+                } else {
+                    width++;
+                    progress.style.width = width + '%';
+                }
+            }, 50); // Increase progress every 50ms (you can adjust this for realistic timing)
+        });
+    </script>
 </body>
 
 </html>
