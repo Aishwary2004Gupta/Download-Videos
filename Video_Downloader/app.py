@@ -66,7 +66,7 @@ def download():
         'quiet': True,
         'no-warnings': True,
         'retries': 10,  
-        'http_headers': custom_headers,  # Custom headers for Instagram/Twitter
+        'http_headers': custom_headers,  
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
             'preferedformat': 'mp4',
