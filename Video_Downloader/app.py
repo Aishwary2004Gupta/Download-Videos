@@ -65,7 +65,7 @@ def download():
         'progress_hooks': [progress_hook],
         'quiet': True,
         'no-warnings': True,
-        'retries': 10,  # Increase retries for network issues
+        'retries': 10,  
         'http_headers': custom_headers,  # Custom headers for Instagram/Twitter
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
