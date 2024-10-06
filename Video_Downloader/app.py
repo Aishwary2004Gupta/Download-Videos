@@ -43,7 +43,6 @@ def download():
     progress_data["progress"] = 0
     video_url = request.form['video_url']
 
-    # Ensure the form is reset after download
     video_url = video_url.strip()
     if not video_url:
         flash("Please enter a valid URL.", "danger")
