@@ -59,7 +59,7 @@ def download():
     }
 
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',  # Download best quality video + audio
+        'format': 'bestvideo+bestaudio/best',  
         'merge_output_format': 'mp4',
         'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
