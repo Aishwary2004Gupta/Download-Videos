@@ -94,6 +94,14 @@
         width: 0%;
     }
 
+    .progress-text {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        color: black;
+        font-weight: bold;
+    }
+
     .overlay {
         position: absolute;
         bottom: 10px;
@@ -145,6 +153,7 @@
 
         <!-- Progress bar -->
         <div class="progress-bar">
+            <div class="progress-text">0%</div>
             <div class="progress"></div>
         </div>
     </div>
@@ -154,19 +163,28 @@
             // Show the progress bar
             document.querySelector('.progress-bar').style.display = 'block';
 
-            // Simulate progress (for demo purposes)
-            let progress = document.querySelector('.progress');
-            let width = 0;
-            let interval = setInterval(function () {
-                if (width >= 100) {
-                    clearInterval(interval);
-                } else {
-                    width++;
-                    progress.style.width = width + '%';
-                }
-            }, 50); // Increase progress every 50ms (you can adjust this for realistic timing)
+            function updateProgress() {
+                fetch('/progress')
+                    .then(response => response.json())
+                    .then(data => {
+                        const progressBar = document.querySelector('.progress');
+                        const progressText = document.querySelector('.progress-text');
+
+                        // Update the width of the progress bar and the text
+                        progressBar.style.width = data.progress + '%';
+                        progressText.textContent = data.progress + '%';
+
+                        // Continue to poll until the progress reaches 100%
+                        if (data.progress < 100) {
+                            setTimeout(updateProgress, 1000); // Poll every 1 second
+                        }
+                    });
+            }
+
+            // Start polling the progress endpoint
+            updateProgress();
         });
     </script>
-    
 </body>
+
 </html>
