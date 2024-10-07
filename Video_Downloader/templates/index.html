@@ -200,7 +200,7 @@
                     .then(data => {
                         const progressBar = document.querySelector('.progress');
                         const progressText = document.querySelector('.progress-text');
-                        progressBar.style.width = data.progress + '%';  // Update progress bar width
+                        progressBar.style.width = data.progress + '%'; 
                         progressText.textContent = data.progress + '%';  
                     });
             }
