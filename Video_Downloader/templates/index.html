@@ -150,36 +150,62 @@
             <button type="submit">Download</button>
         </form>
 
-        <!-- Progress bar -->
         <div class="progress-bar">
             <div class="progress-text">0%</div>
             <div class="progress"></div>
         </div>
-
     </div>
+
 
     <script>
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
-            document.querySelector('.progress-bar').style.display = 'block';
-
+            e.preventDefault();  // Prevent form from submitting immediately
+            const form = this;
+            document.querySelector('.progress-bar').style.display = 'block';  // Show the progress bar
+            const intervalId = setInterval(updateProgress, 500);  // Start updating progress
+    
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form)
+            }).then(response => {
+                if (response.ok) {
+                    return response.blob();  // Get the response as a blob
+                } else {
+                    throw new Error('Download failed');
+                }
+            }).then(blob => {
+                clearInterval(intervalId);  // Stop updating progress
+                document.querySelector('.progress-bar').style.display = 'none';  // Hide progress bar
+                document.querySelector('.progress').style.width = '0%';  // Reset progress bar
+                document.querySelector('.progress-text').textContent = '0%';  // Reset progress text
+    
+                // Create a URL for the blob and download it
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'video.mp4';  // Replace this with the actual video name if possible
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);  // Clean up the blob URL
+    
+            }).catch(error => {
+                clearInterval(intervalId);  // Stop updating progress
+                alert(error.message);  // Show error message
+            });
+    
             function updateProgress() {
                 fetch('/progress')
                     .then(response => response.json())
                     .then(data => {
                         const progressBar = document.querySelector('.progress');
                         const progressText = document.querySelector('.progress-text');
-
-                        progressBar.style.width = data.progress + '%';
-                        progressText.textContent = data.progress + '%';
-
-                        if (data.progress < 100) {
-                            setTimeout(updateProgress, 500);  // Faster updates
-                        }
+                        progressBar.style.width = data.progress + '%';  // Update progress bar width
+                        progressText.textContent = data.progress + '%';  // Update progress text
                     });
             }
-            updateProgress();
         });
-    </script>
+    </script>    
 </body>
 
 </html>
