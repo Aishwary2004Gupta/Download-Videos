@@ -81,9 +81,9 @@ def download():
             info_dict = ydl.extract_info(video_url, download=True)
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
-
+    
             downloaded_file_path = os.path.join(temp_dir, f"{video_title_sanitized}.mp4")
-
+    
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
@@ -95,7 +95,6 @@ def download():
             except Exception as e:
                 print(f"Error cleaning up temp dir: {e}")
             return response
-
         # Check if the file exists and send it to the user
         if os.path.exists(downloaded_file_path):
             flash('Download completed successfully!', 'success')
