@@ -77,7 +77,6 @@
         background-color: #45a049;
     }
 
-    /* Progress bar styling */
     .progress-bar {
         width: 100%;
         background-color: #f3f3f3;
@@ -156,11 +155,11 @@
             <div class="progress-text">0%</div>
             <div class="progress"></div>
         </div>
+
     </div>
 
     <script>
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
-            // Show the progress bar
             document.querySelector('.progress-bar').style.display = 'block';
 
             function updateProgress() {
@@ -174,7 +173,7 @@
                         progressText.textContent = data.progress + '%';
 
                         if (data.progress < 100) {
-                            setTimeout(updateProgress, 1000);
+                            setTimeout(updateProgress, 500);  // Faster updates
                         }
                     });
             }
