@@ -28,7 +28,7 @@ def progress_hook(d):
     elif d['status'] == 'finished':
         progress_data["progress"] = 100
     else:
-        print(f"No progress info: {d}")  # Added logging to check missing progress
+        print(f"No progress info: {d}")  # check missing progress
 
 @app.route('/')
 def index():
