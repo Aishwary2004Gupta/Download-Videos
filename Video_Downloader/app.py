@@ -15,7 +15,7 @@ downloaded_file_path = None
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
-# Progress hook to show download progress
+# Progress hook - shows download progress
 def progress_hook(d):
     if d['status'] == 'downloading':
         total_bytes = d.get('total_bytes') or d.get('total_bytes_estimate', 0)
