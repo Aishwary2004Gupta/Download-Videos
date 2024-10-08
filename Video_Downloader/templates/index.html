@@ -154,16 +154,22 @@
             <div class="progress-text">0%</div>
             <div class="progress"></div>
         </div>
-    </div>
 
+        <div class="download-message" style="display:none;">Downloading started...</div>
+
+    </div>
 
     <script>
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
             e.preventDefault();  // Prevent form from submitting immediately
             const form = this;
-            document.querySelector('.progress-bar').style.display = 'block';  // Show the progress bar
+
+            // Show the progress bar and the "downloading started" message
+            document.querySelector('.progress-bar').style.display = 'block';  
+            document.querySelector('.download-message').style.display = 'block';
+
             const intervalId = setInterval(updateProgress, 500);  // Start updating progress
-    
+
             fetch(form.action, {
                 method: 'POST',
                 body: new FormData(form)
@@ -178,7 +184,10 @@
                 document.querySelector('.progress-bar').style.display = 'none';  // Hide progress bar
                 document.querySelector('.progress').style.width = '0%';  // Reset progress bar
                 document.querySelector('.progress-text').textContent = '0%';  // Reset progress text
-    
+            
+                // Hide the "downloading started" message
+                document.querySelector('.download-message').style.display = 'none';
+            
                 // Create a URL for the blob and download it
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -188,10 +197,11 @@
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);  // Clean up the blob URL
-    
+            
             }).catch(error => {
                 clearInterval(intervalId);  // Stop updating progress
                 alert(error.message);  // Show error message
+                document.querySelector('.download-message').style.display = 'none';  // Hide the message on failure
             });
     
             function updateProgress() {
