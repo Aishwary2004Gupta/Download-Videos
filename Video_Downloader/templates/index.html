@@ -161,14 +161,14 @@
 
     <script>
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
-            e.preventDefault();  // Prevent form from submitting immediately
+            e.preventDefault();  
             const form = this;
 
             // Show the progress bar and the "downloading started" message
             document.querySelector('.progress-bar').style.display = 'block';  
             document.querySelector('.download-message').style.display = 'block';
 
-            const intervalId = setInterval(updateProgress, 500);  // Start updating progress
+            const intervalId = setInterval(updateProgress, 500);  
 
             fetch(form.action, {
                 method: 'POST',
