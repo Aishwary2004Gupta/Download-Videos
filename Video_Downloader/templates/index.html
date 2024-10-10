@@ -199,9 +199,9 @@
                 window.URL.revokeObjectURL(url);  // Clean up the blob URL
             
             }).catch(error => {
-                clearInterval(intervalId);  // Stop updating progress
+                clearInterval(intervalId);  
                 alert(error.message);  // Show error message
-                document.querySelector('.download-message').style.display = 'none';  // Hide the message on failure
+                document.querySelector('.download-message').style.display = 'none';  
             });
     
             function updateProgress() {
