@@ -139,7 +139,7 @@ button:hover {
     height: 25px;
     border-radius: 5px;
     overflow: hidden;
-    position: relative; /* Add this to position the text relative to the bar */
+    position: relative;
     display: none;
 }
 
