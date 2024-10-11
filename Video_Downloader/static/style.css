@@ -156,5 +156,5 @@ button:hover {
     transform: translate(-50%, -50%);
     color: black;
     font-weight: bold;
-    z-index: 1; /* Ensures text appears above the progress bar */
+    z-index: 1; 
 }
