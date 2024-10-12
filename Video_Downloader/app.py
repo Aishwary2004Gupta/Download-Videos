@@ -15,7 +15,6 @@ downloaded_file_path = None
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
-# Progress hook - shows download progress
 def progress_hook(d):
     if d['status'] == 'downloading':
         total_bytes = d.get('total_bytes') or d.get('total_bytes_estimate', 0)
@@ -28,7 +27,7 @@ def progress_hook(d):
     elif d['status'] == 'finished':
         progress_data["progress"] = 100
     else:
-        print(f"No progress info: {d}")  # check missing progress
+        print(f"No progress info: {d}")
 
 @app.route('/')
 def index():
@@ -41,17 +40,17 @@ def progress():
 @app.route('/download', methods=['POST'])
 def download():
     global progress_data, downloaded_file_path
-    progress_data["progress"] = 0  # Reset progress at the start of each download
-    video_url = request.form['video_url']
+    progress_data["progress"] = 0
+    video_url = request.form['video_url'].strip()
 
-    video_url = video_url.strip()
     if not video_url:
         flash("Please enter a valid URL.", "danger")
         return redirect(url_for('index'))
 
     print(f"Download requested for URL: {video_url} at {time.time()}")
 
-    temp_dir = tempfile.mkdtemp()
+    # Use the Downloads folder instead of a temporary directory
+    download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
 
     custom_headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -60,7 +59,7 @@ def download():
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
         'merge_output_format': 'mp4',
-        'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
+        'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_hook],
         'quiet': True,
         'no-warnings': True,
@@ -82,19 +81,11 @@ def download():
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
     
-            downloaded_file_path = os.path.join(temp_dir, f"{video_title_sanitized}.mp4")
+            downloaded_file_path = os.path.join(download_dir, f"{video_title_sanitized}.mp4")
     
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        @after_this_request
-        def cleanup(response):
-            try:
-                time.sleep(1)  # Ensures file write completion before deleting the temp folder
-                shutil.rmtree(temp_dir)
-            except Exception as e:
-                print(f"Error cleaning up temp dir: {e}")
-            return response
         # Check if the file exists and send it to the user
         if os.path.exists(downloaded_file_path):
             flash('Download completed successfully!', 'success')
