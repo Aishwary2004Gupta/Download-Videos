@@ -196,7 +196,7 @@
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-                window.URL.revokeObjectURL(url);  // Clean up the blob URL
+                window.URL.revokeObjectURL(url);  
             
             }).catch(error => {
                 clearInterval(intervalId);  
