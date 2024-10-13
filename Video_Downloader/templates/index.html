@@ -175,7 +175,7 @@
                 body: new FormData(form)
             }).then(response => {
                 if (response.ok) {
-                    return response.blob();  // Get the response as a blob
+                    return response.blob();  
                 } else {
                     throw new Error('Download failed');
                 }
