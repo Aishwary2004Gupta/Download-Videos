@@ -182,7 +182,7 @@
             }).then(blob => {
                 clearInterval(intervalId);  // Stop updating progress
                 document.querySelector('.progress-bar').style.display = 'none';  // Hide progress bar
-                document.querySelector('.progress').style.width = '0%';  // Reset progress bar
+                document.querySelector('.progress').style.width = '0%';  
                 document.querySelector('.progress-text').textContent = '0%'; 
             
                 // Hide the "downloading started" message
