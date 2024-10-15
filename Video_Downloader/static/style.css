@@ -83,7 +83,6 @@ button:hover {
     color: #721c24;
 }
 
-/* Loading bar container */
 #loadingBarContainer {
     position: fixed;
     bottom: 10px;
