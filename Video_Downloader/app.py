@@ -49,7 +49,6 @@ def download():
 
     print(f"Download requested for URL: {video_url} at {time.time()}")
 
-
     download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
 
     custom_headers = {
