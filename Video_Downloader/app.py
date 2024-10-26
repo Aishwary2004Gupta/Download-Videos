@@ -53,40 +53,47 @@ def download():
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',
-        'merge_output_format': 'mp4',
-        'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
-        'progress_hooks': [progress_hook],
-        'quiet': True,
-        'no-warnings': True,
-        'retries': 10,
-        'http_headers': custom_headers,
-        'postprocessors': [{
-            'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'mp4',
-        }],
-        'noplaylist': True,
-        'timeout': 600,
-        'sleep_interval_requests': 5,
-        'geo_bypass': True,
-    }
-
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=True)
+        # First extract info without downloading
+        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+            info_dict = ydl.extract_info(video_url, download=False)
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
-    
-            downloaded_file_path = os.path.join(download_dir, f"{video_title_sanitized}.mp4")
-    
-            current_time = time.time()
-            os.utime(downloaded_file_path, (current_time, current_time))
+            # Set the output path with original title
+            output_path = os.path.join(download_dir, f"{video_title_sanitized}.mp4")
 
-        # Check if the file exists and send it to the user
+        ydl_opts = {
+            'format': 'bestvideo+bestaudio/best',
+            'merge_output_format': 'mp4',
+            'outtmpl': output_path,
+            'progress_hooks': [progress_hook],
+            'quiet': True,
+            'no-warnings': True,
+            'retries': 10,
+            'http_headers': custom_headers,
+            'postprocessors': [{
+                'key': 'FFmpegVideoConvertor',
+                'preferedformat': 'mp4',
+            }],
+            'noplaylist': True,
+            'timeout': 600,
+            'sleep_interval_requests': 5,
+            'geo_bypass': True,
+        }
+
+        # Download with specified options
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([video_url])
+            downloaded_file_path = output_path
+
         if os.path.exists(downloaded_file_path):
             flash('Download completed successfully!', 'success')
-            return send_file(downloaded_file_path, as_attachment=True, download_name=f"{video_title_sanitized}.mp4")
+            return send_file(
+                downloaded_file_path,
+                as_attachment=True,
+                download_name=f"{video_title_sanitized}.mp4",
+                mimetype='video/mp4'
+            )
         else:
             flash('The file could not be found.', 'danger')
 
