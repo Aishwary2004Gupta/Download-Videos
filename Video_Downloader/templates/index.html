@@ -161,46 +161,50 @@
 
     <script>
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
-            e.preventDefault();  
+            e.preventDefault();
             const form = this;
-
-            document.querySelector('.progress-bar').style.display = 'block';  
+    
+            document.querySelector('.progress-bar').style.display = 'block';
             document.querySelector('.download-message').style.display = 'block';
-
-            const intervalId = setInterval(updateProgress, 500);  
-
+    
+            const intervalId = setInterval(updateProgress, 500);
+    
             fetch(form.action, {
                 method: 'POST',
                 body: new FormData(form)
             }).then(response => {
                 if (response.ok) {
-                    return response.blob();  // Get the response as a blob
+                    // Get the filename from the response header
+                    const disposition = response.headers.get('Content-Disposition');
+                    let filename = 'downloaded_video.mp4'; // Default name in case header is not set
+                    if (disposition && disposition.indexOf('filename=') !== -1) {
+                        const matches = disposition.match(/filename="([^"]+)"/);
+                        if (matches && matches[1]) filename = matches[1];
+                    }
+                    return response.blob().then(blob => ({ blob, filename }));
                 } else {
                     throw new Error('Download failed');
                 }
-            }).then(blob => {
-                clearInterval(intervalId);  // Stop updating progress
-                document.querySelector('.progress-bar').style.display = 'none';  // Hide progress bar
-                document.querySelector('.progress').style.width = '0%';  
-                document.querySelector('.progress-text').textContent = '0%'; 
-            
-                // Hide the "downloading started" message
+            }).then(({ blob, filename }) => {
+                clearInterval(intervalId);
+                document.querySelector('.progress-bar').style.display = 'none';
+                document.querySelector('.progress').style.width = '0%';
+                document.querySelector('.progress-text').textContent = '0%';
                 document.querySelector('.download-message').style.display = 'none';
-            
-                // Create a URL for the blob and download it
+    
+                // Create a URL for the blob and download it using the extracted filename
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'video.mp4';  
+                a.download = filename; // Use the server-provided filename
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-                window.URL.revokeObjectURL(url);  
-            
+                window.URL.revokeObjectURL(url);
             }).catch(error => {
-                clearInterval(intervalId);  
-                alert(error.message);  
-                document.querySelector('.download-message').style.display = 'none';  
+                clearInterval(intervalId);
+                alert(error.message);
+                document.querySelector('.download-message').style.display = 'none';
             });
     
             function updateProgress() {
@@ -209,13 +213,13 @@
                     .then(data => {
                         const progressBar = document.querySelector('.progress');
                         const progressText = document.querySelector('.progress-text');
-                        progressBar.style.width = data.progress + '%'; 
-                        progressText.textContent = data.progress + '%';  
-                    }
-                );
+                        progressBar.style.width = data.progress + '%';
+                        progressText.textContent = data.progress + '%';
+                    });
             }
         });
-    </script>    
+    </script>
+        
 </body>
 
 </html>
