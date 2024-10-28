@@ -77,18 +77,21 @@ def download():
             info_dict = ydl.extract_info(video_url, download=True)
             video_title = info_dict.get('title', 'video')
             video_title_sanitized = sanitize_filename(video_title)
-    
+
             downloaded_file_path = os.path.join(download_dir, f"{video_title_sanitized}.mp4")
-    
+
             current_time = time.time()
             os.utime(downloaded_file_path, (current_time, current_time))
 
-        # Check if the file exists and send it to the user
-        if os.path.exists(downloaded_file_path):
-            flash('Download completed successfully!', 'success')
-            return send_file(downloaded_file_path, as_attachment=True, download_name=f"{video_title_sanitized}.mp4")
-        else:
-            flash('The file could not be found.', 'danger')
+            # Check if the file exists and send it to the user
+            if os.path.exists(downloaded_file_path):
+                flash('Download completed successfully!', 'success')
+                return send_file(downloaded_file_path, as_attachment=True, download_name=f"{video_title_sanitized}.mp4")
+            else:
+                flash('The file could not be found.', 'danger')
+
+            # Delete the downloaded file after sending it to the user
+            os.remove(downloaded_file_path)
 
     except yt_dlp.DownloadError as e:
         if "login required" in str(e).lower() and "instagram" in video_url:
