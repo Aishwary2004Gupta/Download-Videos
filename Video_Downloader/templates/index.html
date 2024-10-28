@@ -206,7 +206,7 @@
                 alert(error.message);
                 document.querySelector('.download-message').style.display = 'none';
             });
-    
+            
             function updateProgress() {
                 fetch('/progress')
                     .then(response => response.json())
@@ -219,6 +219,6 @@
             }
         });
     </script>
-    
+
 </body>
 </html>
