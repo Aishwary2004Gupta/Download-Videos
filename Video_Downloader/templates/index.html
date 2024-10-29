@@ -160,24 +160,18 @@
     </div>
 
     <script>
-        let downloadInProgress = false;  // Variable to prevent double download
-    
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
-            e.preventDefault();  // Prevent the default form submission
-    
-            // Prevent multiple downloads by checking if one is in progress
-            if (downloadInProgress) return;
-    
-            downloadInProgress = true;
+            e.preventDefault(); // Prevent the default form submission
             const form = this;
     
             // Display progress elements
             document.querySelector('.progress-bar').style.display = 'block';
             document.querySelector('.download-message').style.display = 'block';
     
-            // Start progress updates at intervals
+            // Update progress at intervals
             const intervalId = setInterval(updateProgress, 500);
     
+            // Perform fetch to initiate download on server side
             fetch(form.action, {
                 method: 'POST',
                 body: new FormData(form)
@@ -185,7 +179,7 @@
                 if (response.ok) {
                     // Get filename from Content-Disposition header if available
                     const disposition = response.headers.get('Content-Disposition');
-                    let filename = 'downloaded_video.mp4';  // Default name
+                    let filename = 'downloaded_video.mp4'; // Default name in case header is not set
                     if (disposition && disposition.indexOf('filename=') !== -1) {
                         const matches = disposition.match(/filename="([^"]+)"/);
                         if (matches && matches[1]) filename = matches[1];
@@ -195,7 +189,8 @@
                     throw new Error('Download failed');
                 }
             }).then(({ blob, filename }) => {
-                clearInterval(intervalId);  // Stop progress updates
+                // Stop the progress updates and hide the progress bar
+                clearInterval(intervalId);
                 document.querySelector('.progress-bar').style.display = 'none';
                 document.querySelector('.progress').style.width = '0%';
                 document.querySelector('.progress-text').textContent = '0%';
@@ -205,18 +200,16 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = filename;  // Use the filename from the server
+                a.download = filename; // Set the filename received from the server
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-    
-                downloadInProgress = false;  // Reset the flag after the download
             }).catch(error => {
-                clearInterval(intervalId);  // Stop progress updates
+                // Handle errors
+                clearInterval(intervalId);
                 alert(error.message);
                 document.querySelector('.download-message').style.display = 'none';
-                downloadInProgress = false;  // Reset the flag in case of error
             });
     
             // Update progress function
@@ -232,7 +225,6 @@
             }
         });
     </script>
-    
     
 
 </body>
