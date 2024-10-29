@@ -161,19 +161,23 @@
 
     <script>
         document.getElementById('downloadForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent the default form submission
             const form = this;
     
+            // Display progress elements
             document.querySelector('.progress-bar').style.display = 'block';
             document.querySelector('.download-message').style.display = 'block';
     
+            // Update progress at intervals
             const intervalId = setInterval(updateProgress, 500);
     
+            // Perform fetch to initiate download on server side
             fetch(form.action, {
                 method: 'POST',
                 body: new FormData(form)
             }).then(response => {
                 if (response.ok) {
+                    // Get filename from Content-Disposition header if available
                     const disposition = response.headers.get('Content-Disposition');
                     let filename = 'downloaded_video.mp4'; // Default name in case header is not set
                     if (disposition && disposition.indexOf('filename=') !== -1) {
@@ -185,27 +189,30 @@
                     throw new Error('Download failed');
                 }
             }).then(({ blob, filename }) => {
+                // Stop the progress updates and hide the progress bar
                 clearInterval(intervalId);
                 document.querySelector('.progress-bar').style.display = 'none';
                 document.querySelector('.progress').style.width = '0%';
                 document.querySelector('.progress-text').textContent = '0%';
                 document.querySelector('.download-message').style.display = 'none';
-
+    
                 // Create a URL for the blob and download it using the extracted filename
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = filename; // Use the server-provided filename
+                a.download = filename; // Set the filename received from the server
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
             }).catch(error => {
+                // Handle errors
                 clearInterval(intervalId);
                 alert(error.message);
                 document.querySelector('.download-message').style.display = 'none';
             });
-            
+    
+            // Update progress function
             function updateProgress() {
                 fetch('/progress')
                     .then(response => response.json())
@@ -218,6 +225,7 @@
             }
         });
     </script>
+    
 
 </body>
 </html>
