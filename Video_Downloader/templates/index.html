@@ -174,7 +174,7 @@
                 body: new FormData(form)
             }).then(response => {
                 if (response.ok) {
-        
+    
                     const disposition = response.headers.get('Content-Disposition');
                     let filename = 'downloaded_video.mp4'; // Default name in case header is not set
                     if (disposition && disposition.indexOf('filename=') !== -1) {
