@@ -1,4 +1,4 @@
-Use this repo to download videos from YouTube, Instagram, Twitter(X) and even from various other platforms at high quality and in fast speed. Thanks to ffmpeg. 
+Use this repo to download videos from YouTube, Instagram, Twitter(X) and even from various other platforms at high quality and in fast speed. Thanks to ffmpeg.
 
 Steps to do so:
 
