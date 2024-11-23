@@ -28,7 +28,6 @@ You could even watch your video being downladed from the terminal 👇🏻 or wa
 
 ![Terminal](https://github.com/user-attachments/assets/466a3d0f-05a4-4de0-bbac-f869a4bb265e)
 
-
     8. Finally your video would be downloaded at your preffered location and in high quality
     
     This is the indication that your video has been downloaded
