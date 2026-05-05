@@ -9,7 +9,7 @@ Steps to do so:
     
     2. Open the terminal and go inside the folder where the repo is present
 
-3. Run this command 👇🏻 (Make sure you have python installed in your device)
+3. Run this command 👇🏻 (Make sure you have python installed in your device) 
 
        python app.py
 
