@@ -27,7 +27,7 @@ Steps to do so:
 
     8. Then click on the "Download Video" button 🎉
 
-You could even watch your video being downladed from the terminal 👇🏻 or wait for the site to reload with the confirmation message
+You could even watch your video being downladed from the terminal 👇🏻 or wait for the site to reload with the confirmation message 
 
 ![Terminal](https://github.com/user-attachments/assets/466a3d0f-05a4-4de0-bbac-f869a4bb265e)
 
