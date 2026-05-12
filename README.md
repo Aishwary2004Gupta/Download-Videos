@@ -1,4 +1,4 @@
-![MultiVideoDownloader](https://github.com/user-attachments/assets/ca88083f-5be0-429b-9708-000eeaefab46)  
+![MultiVideoDownloader](https://github.com/user-attachments/assets/ca88083f-5be0-429b-9708-000eeaefab46)   
 
 
 Use this repo to download videos from YouTube, Instagram, Twitter(X) and even from various other platforms at high quality and in fast speed. Thanks to ffmpeg. 
